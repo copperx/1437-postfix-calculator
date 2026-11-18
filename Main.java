@@ -2,43 +2,58 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        IntStack s = new IntStack();
-        Scanner keyboard = new Scanner(System.in);
-        System.out.print("Enter postfix expression: ");
-        String expr = keyboard.nextLine();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter a postfix expression: ");
+        String input = scanner.nextLine();
 
-        String[] parts = expr.split(" ");
-        for(String part : parts) {
-            // Is part a number or an operator?
-            if(isOperator(part)) {
-                int value2 = s.pop();
-                int value1 = s.pop();
-                if(part.equals("+")) {
-                    s.push(value1 + value2);
-                } else if(part.equals("-")) {
-                    s.push(value1 - value2);
-                } else if(part.equals("*")) {
-                    s.push(value1 * value2);
-                } else if(part.equals("/")) {
-                    s.push(value1 / value2);
-                } else {
-                    System.out.println("Unsupported operator: " + part);
-                }                
-            } else {
-                try {
-                    s.push(Integer.parseInt(part));
-                } catch(RuntimeException e) {
-                    System.out.println("Malformed expression");
+        IntStack s = new IntStack();
+        String[] parts = input.trim().split("\\s+");
+
+        for (String part : parts) {
+            if (isOperator(part)) {
+                if (s.isEmpty()) {
+                    System.out.println("Missing number");
+                    return;
                 }
+                double value2 = s.pop();
+
+                if (s.isEmpty()) {
+                    System.out.println("Missing number");
+                    return;
+                }
+                double value1 = s.pop();
+
+                if (part.equals("+")) {
+                    s.push(value1 + value2);
+                } else if (part.equals("-")) {
+                    s.push(value1 - value2);
+                } else if (part.equals("*")) {
+                    s.push(value1 * value2);
+                } else if (part.equals("/")) {
+                    s.push(value1 / value2);
+                } else if (part.equals("^")) {
+                    s.push(Math.pow(value1, value2));
+                }
+            } else {
+                s.push(Double.parseDouble(part));
             }
         }
-        // Here, hthe result should be at the top of the stack.
-        int result = s.pop();
-        System.out.println("The result is " + result);
+
+        if (s.isEmpty()) {
+            System.out.println("Missing number");
+            return;
+        }
+
+        double result = s.pop();
+        if (!s.isEmpty()) {
+            System.out.println("Missing operator");
+            return;
+        }
+
+        System.out.println(result);
     }
 
     public static boolean isOperator(String s) {
-        return s.equals("+") || s.equals("-") || 
-            s.equals("*") || s.equals("/");
+        return s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/") || s.equals("^");
     }
 }
